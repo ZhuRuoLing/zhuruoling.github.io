@@ -36,5 +36,6 @@
     mask-composite: exclude;
 
     -webkit-mask: -webkit-linear-gradient(#fff, #fff) content-box, -webkit-linear-gradient(#fff, #fff);
-    -webkit-mask-composite: destination-out;
+    -webkit-mask-composite: destination-out; /* safari issue */
+    -webkit-mask-composite: exclude; /* firefox issue */
 }
