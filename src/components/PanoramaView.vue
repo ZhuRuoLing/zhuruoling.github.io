@@ -56,7 +56,7 @@ async function getTexturesFromAtlasFile(atlasImgUrl: string) {
   }
 
   for (let i = 0; i < 6; i++) {
-    let image = await new THREE.ImageLoader().loadAsync(atlasImgUrl + "_" + i + ".jpg");
+    let image = await new THREE.ImageLoader().loadAsync(atlasImgUrl + "_" + i + ".jpeg");
     let tileSize = image.width;
     let canvas = document.createElement("canvas") as HTMLCanvasElement;
     canvas.height = tileSize;
