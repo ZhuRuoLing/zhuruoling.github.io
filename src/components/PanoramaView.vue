@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as THREE from "three";
-import {Fog, PerspectiveCamera, Scene, WebGLRenderer} from "three";
+import {PerspectiveCamera, Scene, WebGLRenderer} from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls.js";
 import {onMounted, ref} from "vue";
 import {useEventListener} from "@vueuse/core";
