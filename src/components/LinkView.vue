@@ -9,7 +9,6 @@ const view = ref()
 
 const onMouseOver = () => {
   view.value.classList.add('linkView')
-
 }
 
 const onClick = () => {
