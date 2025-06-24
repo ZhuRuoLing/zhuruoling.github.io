@@ -23,7 +23,7 @@ function weightedRandomChoice<T>(elements: T[], weights: number[]): T {
   throw new Error("Failed to select an element."); // 应对未选中元素的情况
 }
 
-const weights = [3, 4, 5, 100];
+const weights = [3, 4, 5, 1];
 
 const names = [
   "和楽 小春",
