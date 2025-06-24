@@ -46,7 +46,7 @@ let splash = ref(name.value === "undefined")
   <div class="flex justify-center content-center min-h-screen items-center of-visible">
     <PanoramaView class="absolute"/>
     <div class="z-1 glass-card text-white flex flex-col of-visible">
-      <img src="../public/icon.jpg" height="128" width="128" class="rounded-3xl mb-4 mx-a"/>
+      <img src="../public/icon.jpg" height="128" width="128" class="rounded-3xl mb-4 mx-a avatar"/>
       <div v-if="splash" class="splash">
         故意保留一点原味你才知道这里是typescript
       </div>
@@ -96,5 +96,12 @@ let splash = ref(name.value === "undefined")
   top: 5rem;
   right: -5rem;
   animation: splash 2s infinite ease-in-out;
+}
+
+.avatar {
+  transition: filter 300ms;
+}
+.avatar:hover {
+  filter: drop-shadow(0 0 2em #9fc7f6);
 }
 </style>
