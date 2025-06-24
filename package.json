@@ -9,12 +9,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vueuse/core": "^13.4.0",
+    "three": "^0.177.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {
+    "@types/three": "^0.177.0",
+    "@unocss/preset-wind3": "^66.2.3",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
     "typescript": "~5.8.3",
+    "unocss": "^66.2.3",
     "vite": "^6.3.5",
     "vue-tsc": "^2.2.8"
   }

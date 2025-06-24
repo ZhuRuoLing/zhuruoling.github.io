@@ -1,0 +1,40 @@
+@keyframes borderCycle {
+    0%   { background-position: 0%0%; }
+    25%  { background-position: 100%  0%; }
+    50%  { background-position: 100% 100%; }
+    75%  { background-position: 0% 100%; }
+    100% { background-position: 0%  0%; }
+}
+
+.glass-card {
+    position: relative;
+    padding: 1rem 2.5rem;
+    border-radius: 1.5rem;
+    z-index: 1;
+
+    font-family: "PingFang SC",sans-serif;
+
+    background: rgba(200, 200, 200, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    /* 留出 4px 内边距，伪元素的 content-box 就是内层，border-box 才是外框 */
+    padding: 4px;
+    animation: borderCycle 3s linear infinite;
+    background: linear-gradient(45deg, #fbcfe8, #bfdbfe, #ffffff, #fbcfe8, #bfdbfe, #ffffff);
+    background-size: 200% 200%;
+    pointer-events: none;
+
+    mask: linear-gradient(#fff, #fff) content-box, linear-gradient(#fff, #fff);
+    mask-composite: exclude;
+
+    -webkit-mask: -webkit-linear-gradient(#fff, #fff) content-box, -webkit-linear-gradient(#fff, #fff);
+    -webkit-mask-composite: destination-out;
+}
