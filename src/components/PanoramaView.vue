@@ -44,8 +44,7 @@ onMounted(async () => {
   skyBox.geometry.scale(1, 1, -1);
   scene.add(skyBox);
   scene.fog = null
-
-  animate();
+  renderer.setAnimationLoop(animate)
 });
 
 async function getTexturesFromAtlasFile(atlasImgUrl: string) {
@@ -84,7 +83,6 @@ async function getTexturesFromAtlasFile(atlasImgUrl: string) {
 }
 
 function animate() {
-  requestAnimationFrame(animate);
   controls.update();
   renderer.render(scene, camera);
 }
