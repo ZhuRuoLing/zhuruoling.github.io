@@ -26,7 +26,6 @@ function weightedRandomChoice<T>(elements: T[], weights: number[]): T {
 const weights = [3, 4, 5, 1];
 
 const names = [
-  "和楽 小春",
   "竹猫",
   "竹若泠",
   "undefined"
@@ -40,19 +39,32 @@ let name = computed(() => {
 })
 
 let splash = ref(name.value === "undefined")
+
+const avatarRef = ref<HTMLImageElement | null>(null);
+
+const PI = 3.1415926535897932384626433832795
+
+let onRotation = (rotationY: number) => {
+  let value = (rotationY * 180 / PI)
+  if (avatarRef.value) {
+    avatarRef.value.style.transform = `rotate(${value}deg)`;
+  }
+}
+
 </script>
 
 <template>
   <div class="flex justify-center content-center min-h-screen items-center of-visible">
-    <PanoramaView class="absolute"/>
+    <PanoramaView class="absolute" :rotation-callback="onRotation"/>
     <div class="z-1 glass-card text-white flex flex-col of-visible">
-      <img src="../public/icon.jpg" height="128" width="128" class="rounded-3xl mb-4 mx-a avatar"/>
+      <img src="../public/icon.png" height="128" width="128" class="rounded-full mb-4 mx-a avatar" alt="avatar" ref="avatarRef"/>
       <div v-if="splash" class="splash">
         故意保留一点原味你才知道这里是typescript
       </div>
 
       <div class="mx-a text-center font-bold text-size-2xl mb-4">
         <div>{{ name }}</div>
+
 
         <div class="flex justify-center mt-8">
           <LinkView href="https://x.com/wagakukoharu" class="min-w-40px min-h-40px max-h-40px max-w-40px me-1">

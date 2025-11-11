@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import * as THREE from "three";
-import {PerspectiveCamera, Scene, WebGLRenderer} from "three";
+import {PerspectiveCamera, Quaternion, Scene, WebGLRenderer} from "three";
 import {OrbitControls} from "three/examples/jsm/controls/OrbitControls.js";
 import {onMounted, ref} from "vue";
-import {useEventListener} from "@vueuse/core";
+import {clamp, useEventListener} from "@vueuse/core";
 
 const background = ref();
+const props = withDefaults(
+  defineProps<{
+    rotationCallback?: (rotationY: number) => void
+  }>(),
+  {}
+)
 let camera: PerspectiveCamera;
 let renderer: WebGLRenderer;
 let controls: OrbitControls;
 let scene: Scene;
 
 useEventListener(window, "resize", onResize);
+useEventListener(window, 'wheel', onWheel, {passive: true})
+
+let targetFov = 100;  // 目标FOV
+const fovDampingFactor = 0.1;  // 阻尼系数 (0-1, 值越小阻尼越强)
 
 onMounted(async () => {
 
@@ -61,11 +71,11 @@ async function getTexturesFromAtlasFile(atlasImgUrl: string) {
     canvas.height = tileSize;
     canvas.width = tileSize;
     canvas.getContext("2d")!.drawImage(
-        image,
-        0, 0,
-        tileSize, tileSize,
-        0, 0,
-        tileSize, tileSize
+      image,
+      0, 0,
+      tileSize, tileSize,
+      0, 0,
+      tileSize, tileSize
     );
     textures[i].image = canvas;
     textures[i].needsUpdate = true;
@@ -82,14 +92,51 @@ async function getTexturesFromAtlasFile(atlasImgUrl: string) {
   return result;
 }
 
+const lastDeltaPx = ref(0)          // last wheel delta in pixels
+const lastRawDelta = ref(0)        // raw deltaY from event
+const lastDeltaMode = ref(0)       // event.deltaMode
+
+function wheelDeltaToPixels(e: WheelEvent) {
+  lastRawDelta.value = e.deltaY
+  lastDeltaMode.value = e.deltaMode
+
+  switch (e.deltaMode) {
+    case 0: // DOM_DELTA_PIXEL
+      return e.deltaY
+    case 1: { // DOM_DELTA_LINE — estimate lines as 16px (adjust if needed)
+      const lineHeight = 16
+      return e.deltaY * lineHeight
+    }
+    case 2: { // DOM_DELTA_PAGE — convert to pixels by viewport height
+      return e.deltaY * window.innerHeight
+    }
+    default:
+      return e.deltaY
+  }
+}
+
+function onWheel(e: WheelEvent) {
+  const px = wheelDeltaToPixels(e)
+  lastDeltaPx.value = px
+  let fovDelta = px < 0 ? -5 : 5
+  targetFov = clamp(targetFov + fovDelta, 45, 130)
+  controls.update()
+}
+
 function animate() {
   controls.update();
+  camera.fov += (targetFov - camera.fov) * fovDampingFactor;
+  camera.updateProjectionMatrix();
+  if (props.rotationCallback) {
+    props.rotationCallback(new THREE.Euler().setFromQuaternion(camera.getWorldQuaternion(new Quaternion()), "YXZ").y)
+  }
   renderer.render(scene, camera);
 }
 
 function onResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
+
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 </script>
