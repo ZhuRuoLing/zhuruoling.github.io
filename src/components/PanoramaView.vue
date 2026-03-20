@@ -142,9 +142,24 @@ function onResize() {
 </script>
 
 <template>
-  <div ref="background"/>
+  <div ref="background" class="panorama-container"/>
 </template>
 
 <style scoped>
+.panorama-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
 
+.panorama-container :deep(canvas) {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  outline: none;
+}
 </style>

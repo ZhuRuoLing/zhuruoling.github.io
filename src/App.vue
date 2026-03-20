@@ -1,46 +1,48 @@
 <script setup lang="ts">
 import PanoramaView from "./components/PanoramaView.vue";
 import LinkView from "./components/LinkView.vue";
-import {computed, ref} from "vue";
-
-function weightedRandomChoice<T>(elements: T[], weights: number[]): T {
-  const cumulativeWeights = weights.reduce((acc, weight, index) => {
-    if (index === 0) {
-      acc.push(weight);
-    } else {
-      acc.push(acc[index - 1] + weight);
-    }
-    return acc;
-  }, [] as number[]);
-
-  const randomNum = Math.random() * cumulativeWeights[cumulativeWeights.length - 1];
-
-  for (let i = 0; i < cumulativeWeights.length; i++) {
-    if (randomNum <= cumulativeWeights[i]) {
-      return elements[i];
-    }
-  }
-  throw new Error("Failed to select an element."); // 应对未选中元素的情况
-}
+import {computed, ref, onMounted, onUnmounted} from "vue";
 
 const weights = [3, 4, 5, 1];
 
 const names = [
   "竹猫",
   "竹若泠",
-  "undefined"
+  "TakeNeko"
 ]
 
-let name = computed(() => {
-  return weightedRandomChoice(
-      names,
-      weights
-  )
-})
-
-let splash = ref(name.value === "undefined")
-
 const avatarRef = ref<HTMLImageElement | null>(null);
+const cardRef = ref<HTMLDivElement | null>(null);
+const currentIndex = ref(0);
+const displayText = ref(names[0]);
+
+// 3D tilt effect
+const tiltStyle = ref({ transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)', transition: 'transform 0.1s ease-out' });
+
+function handleMouseMove(e: MouseEvent) {
+  if (!cardRef.value) return;
+  const rect = cardRef.value.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  
+  // Calculate rotation based on mouse position relative to center
+  const rotateX = ((y - centerY) / centerY) * -10; // Max 10deg tilt
+  const rotateY = ((x - centerX) / centerX) * 10;
+  
+  tiltStyle.value = {
+    transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+    transition: 'transform 0.1s ease-out'
+  };
+}
+
+function handleMouseLeave() {
+  tiltStyle.value = {
+    transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
+    transition: 'transform 0.3s ease-out'
+  };
+}
 
 const PI = 3.1415926535897932384626433832795
 
@@ -51,19 +53,77 @@ let onRotation = (rotationY: number) => {
   }
 }
 
+function getRandomChar() {
+  const rand = Math.random();
+  if (rand < 0.33) {
+    // ASCII printable characters (33-126)
+    return String.fromCharCode(33 + Math.floor(Math.random() * 94));
+  } else if (rand < 0.66) {
+    // Common Chinese characters (CJK Unified Ideographs: 4E00-9FFF)
+    return String.fromCharCode(0x4E00 + Math.floor(Math.random() * 0x51FF));
+  } else {
+    // Hiragana/Katakana (Japanese kana: 3040-309F, 30A0-30FF)
+    return String.fromCharCode(0x3040 + Math.floor(Math.random() * 0x60));
+  }
+}
+
+function animateText(targetName: string) {
+  const length = targetName.length;
+  const result = new Array(length).fill("");
+  const settled = new Array(length).fill(false);
+  let frame = 0;
+
+  const interval = setInterval(() => {
+    for (let i = 0; i < length; i++) {
+      if (settled[i]) {
+        result[i] = targetName[i];
+      } else {
+        // Each character goes through more garbled frames before settling
+        const settleFrame = i * 2 + 12;
+        if (frame >= settleFrame) {
+          settled[i] = true;
+          result[i] = targetName[i];
+        } else {
+          result[i] = getRandomChar();
+        }
+      }
+    }
+    displayText.value = result.join("");
+    frame++;
+
+    // Check if all characters are settled
+    if (settled.every(s => s)) {
+      clearInterval(interval);
+    }
+  }, 30);
+}
+
+let timer: ReturnType<typeof setInterval> | null = null;
+
+onMounted(() => {
+  // Start the cycling timer
+  timer = setInterval(() => {
+    currentIndex.value = (currentIndex.value + 1) % names.length;
+    animateText(names[currentIndex.value]);
+  }, 10000);
+});
+
+onUnmounted(() => {
+  if (timer) {
+    clearInterval(timer);
+  }
+});
+
 </script>
 
 <template>
   <div class="flex justify-center content-center min-h-screen items-center of-visible">
     <PanoramaView class="absolute" :rotation-callback="onRotation"/>
-    <div class="z-1 glass-card text-white flex flex-col of-visible">
+    <div ref="cardRef" class="z-1 glass-card text-white flex flex-col of-visible" :style="tiltStyle" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
       <img src="../public/icon.png" height="128" width="128" class="rounded-full mb-4 mx-a avatar" alt="avatar" ref="avatarRef"/>
-      <div v-if="splash" class="splash">
-        故意保留一点原味你才知道这里是typescript
-      </div>
 
       <div class="mx-a text-center font-bold text-size-2xl mb-4">
-        <div>{{ name }}</div>
+        <div class="min-h-2em">{{ displayText }}</div>
 
 
         <div class="flex justify-center mt-8">
