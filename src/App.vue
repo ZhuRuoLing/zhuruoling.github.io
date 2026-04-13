@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import PanoramaView from "./components/PanoramaView.vue";
 import LinkView from "./components/LinkView.vue";
-import {computed, ref, onMounted, onUnmounted} from "vue";
-
-const weights = [3, 4, 5, 1];
+import {ref, onMounted, onUnmounted} from "vue";
 
 const names = [
   "竹猫",
