@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PanoramaView from "./components/PanoramaView.vue";
 import LinkView from "./components/LinkView.vue";
+import CustomCursor from "./components/CustomCursor.vue";
 import {ref, onMounted, onUnmounted} from "vue";
 
 const names = [
@@ -115,6 +116,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <CustomCursor/>
   <div class="flex justify-center content-center min-h-screen items-center of-visible">
     <PanoramaView class="absolute" :rotation-callback="onRotation"/>
     <div ref="cardRef" class="z-1 glass-card text-white flex flex-col of-visible" :style="tiltStyle" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">

@@ -1,3 +1,10 @@
+/* 自定义光标启用时，隐藏系统默认光标 */
+html.has-custom-cursor,
+html.has-custom-cursor body,
+html.has-custom-cursor * {
+    cursor: none !important;
+}
+
 .glass-card {
     position: relative;
     padding: 1rem 2.5rem;
