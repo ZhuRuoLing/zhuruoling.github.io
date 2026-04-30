@@ -7,13 +7,34 @@ import {ref, onMounted, onUnmounted} from "vue";
 const names = [
   "竹猫",
   "竹若泠",
-  "TakeNeko"
+  "takeneko"
 ]
+
+interface AvatarOption {
+  src: string
+  weight: number
+}
+
+const avatarOptions: AvatarOption[] = [
+  { src: "../public/icon.png", weight: 0.1 },
+  { src: "https://avatars.githubusercontent.com/u/98583550?v=4", weight: 0.9 },
+]
+
+function pickWeightedAvatar(): string {
+  const total = avatarOptions.reduce((sum, o) => sum + o.weight, 0)
+  let rand = Math.random() * total
+  for (const option of avatarOptions) {
+    rand -= option.weight
+    if (rand <= 0) return option.src
+  }
+  return avatarOptions[avatarOptions.length - 1].src
+}
 
 const avatarRef = ref<HTMLImageElement | null>(null);
 const cardRef = ref<HTMLDivElement | null>(null);
 const currentIndex = ref(0);
 const displayText = ref(names[0]);
+const currentAvatar = ref(pickWeightedAvatar());
 
 // 3D tilt effect
 const tiltStyle = ref({ transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)', transition: 'transform 0.1s ease-out' });
@@ -120,7 +141,7 @@ onUnmounted(() => {
   <div class="flex justify-center content-center min-h-screen items-center of-visible">
     <PanoramaView class="absolute" :rotation-callback="onRotation"/>
     <div ref="cardRef" class="z-1 glass-card text-white flex flex-col of-visible" :style="tiltStyle" @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
-      <img src="../public/icon.png" height="128" width="128" class="rounded-full mb-4 mx-a avatar" alt="avatar" ref="avatarRef"/>
+      <img :src="currentAvatar" height="128" width="128" class="rounded-full mb-4 mx-a avatar" alt="avatar" ref="avatarRef"/>
 
       <div class="mx-a text-center font-bold text-size-2xl mb-4">
         <div class="min-h-2em">{{ displayText }}</div>
