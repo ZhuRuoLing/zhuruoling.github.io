@@ -1,3 +1,19 @@
+# ⚠️ TODO(迁移收尾): 此文件尚未适配 Astro，切换部署前需修改。
+#
+# 现状说明（重要）：
+#   本 workflow 仅监听 main 分支的 push，因此向工作分支推送不会触发任何构建
+#   或部署。这是刻意保留的行为 —— 迁移期间线上站点不受影响。
+#
+# 收尾时需要做的事：
+#   1. Node 版本改为 22 LTS。当前固定 '23.7.0'（奇数版本、非 LTS），
+#      而 Astro 5+ 要求 node >= 18.20.8 || >= 20.3 || >= 22.0.0。
+#      奇数的 23.x 虽满足下限，但不属于 LTS，建议改为 '22'。
+#   2. 其余步骤无需改动：npm ci && npm run build 产出物同样是 dist/，
+#      与 upload-pages-artifact 的 path: './dist' 一致。
+#   3. 如需改用官方 withastro/action，注意它会自带 build 步骤，
+#      需删掉本文件里的 setup-node / npm ci / npm run build 三步，
+#      否则重复构建。
+#
 # Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
 
@@ -34,6 +50,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Use Node.js 23.7.0
+        # TODO(迁移收尾): 改为 '22'（LTS）
         uses: actions/setup-node@v4
         with:
           node-version: '23.7.0'
