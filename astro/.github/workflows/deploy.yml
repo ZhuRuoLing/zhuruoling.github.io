@@ -1,0 +1,47 @@
+name: Deploy Astro to GitHub Pages
+
+# 注意：本文件位于 astro/ 子目录下，GitHub Actions 只识别仓库根目录的
+# .github/workflows/，因此这里不会自动运行。保留它是为了将来切换时，
+# 直接把这个文件移到根目录即可启用。
+#
+# 另外：根目录已有的 static.yml 只监听 main 分支的 push，
+# 所以向工作分支推送不会触发任何部署。
+
+on:
+  # 仅手动触发，避免与根目录 static.yml 争抢 Pages 部署
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build with Astro
+        # withastro/action 内部执行 npm ci + astro build，
+        # 并产出供 Pages 使用的 artifact（指向 astro/dist）
+        uses: withastro/action@v3
+        with:
+          path: astro
+          node-version: 22
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
