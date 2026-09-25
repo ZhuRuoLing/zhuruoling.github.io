@@ -2,6 +2,8 @@ export const siteName = '竹猫的Blog';
 
 export const bios = [
     '他们说传奇不会飞，我愿意当那个飞物',
+    '一只被困在人身体里的猫',
+    '这个世界终会有我们存在的地方'
 ];
 
 export const socialLinks = [
