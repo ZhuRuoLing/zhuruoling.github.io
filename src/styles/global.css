@@ -1,0 +1,275 @@
+:root {
+    /* 背景层可调参数——内容层唯一的背景控制通道 */
+    --bg-yaw-speed: 0.018;
+
+    /* 内容面板 */
+    --panel-bg: rgba(18, 18, 24, 0.62);
+    --panel-border: rgba(255, 255, 255, 0.12);
+    --code-bg: rgba(0, 0, 0, 0.45);
+    --text-primary: rgba(255, 255, 255, 0.94);
+    --text-secondary: rgba(255, 255, 255, 0.62);
+    --accent: #9fc7f6;
+    --scrollbar-thumb: rgba(159, 199, 246, 0.48);
+    --scrollbar-thumb-hover: rgba(159, 199, 246, 0.72);
+    --scrollbar-track: rgba(16, 16, 20, 0.18);
+
+    --content-max: 46rem;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    /* 背景是 fixed 层，页面本身不需要额外背景色 */
+    background: #101014;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--scrollbar-thumb);
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+    background-clip: padding-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: var(--text-primary);
+    /* 内容层压在背景层之上 */
+    position: relative;
+    z-index: 1;
+}
+
+/* 内容区域：半透明玻璃面板，保证正文在复杂全景图上的可读性 */
+.shell {
+    position: relative;
+    z-index: 1;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: 3rem 1.5rem 6rem;
+}
+
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 1.25rem;
+    padding: 2rem 2.25rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.32);
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+    line-height: 1.3;
+    margin-top: 1.6em;
+    margin-bottom: 0.6em;
+}
+
+p,
+li {
+    line-height: 1.75;
+}
+
+/* 代码块 */
+pre {
+    background: var(--code-bg) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+/*
+ * Shiki 双主题（defaultColor: false）会产生 --shiki-light / --shiki-dark 两套变量，
+ * 需要按配色方案选择。未加这段代码块会是透明前景色（看起来像没高亮）。
+ */
+@media (prefers-color-scheme: dark) {
+    .astro-code,
+    .astro-code span {
+        color: var(--shiki-dark) !important;
+        background-color: var(--shiki-dark-bg) !important;
+        font-style: var(--shiki-dark-font-style) !important;
+        font-weight: var(--shiki-dark-font-weight) !important;
+        text-decoration: var(--shiki-dark-text-decoration) !important;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    .astro-code,
+    .astro-code span {
+        color: var(--shiki-light) !important;
+        background-color: var(--shiki-light-bg) !important;
+        font-style: var(--shiki-light-font-style) !important;
+        font-weight: var(--shiki-light-font-weight) !important;
+        text-decoration: var(--shiki-light-text-decoration) !important;
+    }
+}
+
+code {
+    font-family: "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+}
+
+/* 行内代码 */
+:not(pre) > code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.15em 0.4em;
+    border-radius: 0.35rem;
+    font-size: 0.9em;
+}
+
+/* Shiki 双主题切换用 */
+@media (prefers-color-scheme: light) {
+    :root {
+        --panel-bg: rgba(250, 250, 252, 0.78);
+        --panel-border: rgba(0, 0, 0, 0.08);
+        --code-bg: rgba(246, 248, 250, 0.85);
+        --text-primary: rgba(16, 16, 20, 0.92);
+        --text-secondary: rgba(16, 16, 20, 0.6);
+        --accent: #2f6fb5;
+        --scrollbar-thumb: rgba(47, 111, 181, 0.48);
+        --scrollbar-thumb-hover: rgba(47, 111, 181, 0.72);
+        --scrollbar-track: rgba(244, 244, 246, 0.18);
+    }
+
+    html {
+        background: #f4f4f6;
+    }
+}
+
+/* DOM controls are progressive enhancement; coarse pointers retain native bars. */
+.dom-scrollbar {
+    display: none;
+}
+
+@media (pointer: fine) {
+    html.has-dom-scrollbars,
+    pre.has-dom-scrollbar {
+        scrollbar-width: none;
+    }
+
+    html.has-dom-scrollbars::-webkit-scrollbar,
+    pre.has-dom-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .code-scroll-shell {
+        position: relative;
+        min-width: 0;
+        margin: 1em 0;
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    .code-scroll-shell > pre {
+        margin: 0;
+    }
+
+    .code-scroll-shell > pre > code {
+        display: block;
+        width: max-content;
+        min-width: 100%;
+    }
+
+    .dom-scrollbar {
+        display: block;
+        overflow: hidden;
+        border-radius: 999px;
+        background: var(--scrollbar-track);
+        touch-action: none;
+        user-select: none;
+        cursor: pointer;
+    }
+
+    .dom-scrollbar[hidden] {
+        display: none;
+    }
+
+    .dom-scrollbar--vertical {
+        position: fixed;
+        top: 4px;
+        right: 2px;
+        bottom: 4px;
+        width: 12px;
+        z-index: 1000;
+    }
+
+    .dom-scrollbar--horizontal {
+        position: absolute;
+        left: 5px;
+        right: 5px;
+        bottom: 2px;
+        height: 10px;
+    }
+
+    .dom-scrollbar__thumb {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 2px solid transparent;
+        border-radius: inherit;
+        background: var(--scrollbar-thumb);
+        background-clip: padding-box;
+    }
+
+    .dom-scrollbar:hover .dom-scrollbar__thumb,
+    .dom-scrollbar.is-dragging .dom-scrollbar__thumb,
+    .dom-scrollbar:focus-visible .dom-scrollbar__thumb {
+        background-color: var(--scrollbar-thumb-hover);
+    }
+
+    .dom-scrollbar:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: -2px;
+    }
+}
+
+@media print {
+    .dom-scrollbar {
+        display: none;
+    }
+}
+
+/* 尊重系统的减少动态效果偏好 */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --bg-yaw-speed: 0;
+    }
+}

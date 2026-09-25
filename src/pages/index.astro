@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {getCollection} from 'astro:content';
+import {siteName} from '../data/profile';
+import SiteHeader from '../components/SiteHeader.astro';
+import '../styles/home.css';
+
+const posts = (await getCollection('blog', ({data}) => !data.draft)).sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+const searchIndex = posts.map((post) => ({
+    id: post.id,
+    tags: post.data.tags,
+    text: [post.data.title, post.data.description ?? '', post.body ?? '', ...post.data.tags].join('\n'),
+}));
+---
+
+<BaseLayout title={siteName}>
+    <main class="home-shell" data-home data-search-index={JSON.stringify(searchIndex)}>
+        <SiteHeader/>
+
+        <section class="home-articles" aria-labelledby="articles-heading" data-route-content>
+            <div class="articles-heading">
+                <h2 id="articles-heading">文章</h2>
+                <p data-search-status role="status" aria-live="polite" aria-atomic="true">{posts.length} 篇文章</p>
+                <button class="search-clear" type="button" data-search-clear hidden>清空搜索</button>
+            </div>
+            <div id="home-posts" class="home-posts">
+                {posts.map((post) => (
+                        <article class="panel post-card reveal-card" data-reveal data-tilt data-post-id={post.id}>
+                            <time datetime={post.data.date.toISOString()}>{post.data.date.toISOString().slice(0, 10)}</time>
+                            <h3><a href={`/blog/${post.id}/`}>{post.data.title}</a></h3>
+                            {post.data.description && <p class="post-description">{post.data.description}</p>}
+                            {post.data.tags.length > 0 && (
+                                    <ul class="post-tags" aria-label="文章标签">
+                                        {post.data.tags.map((tag) => (
+                                                <li>
+                                                    <button type="button" data-search-tag={tag}
+                                                            aria-label={`搜索标签 ${tag}`}>#{tag}</button>
+                                                </li>
+                                        ))}
+                                    </ul>
+                            )}
+                        </article>
+                ))}
+            </div>
+            <p class="search-empty" data-search-empty hidden>没有找到匹配的文章。试试其他关键词，或清空搜索。</p>
+        </section>
+    </main>
+    <script>
+        import '../scripts/home';
+    </script>
+</BaseLayout>
