@@ -1,0 +1,42 @@
+.home-articles { width: 100%; min-width: 0; margin-inline: auto; }
+@media (min-width: 1101px) {
+  .home-articles { width: 40%; max-width: 64rem; }
+}
+.articles-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; margin: 0 0 16px; }
+.articles-heading, .search-empty { color: #fff; text-shadow: 0 1px 4px #101014, 0 0 12px rgba(16,16,20,0.8); }
+.articles-heading p, .articles-heading .search-clear { color: inherit; }
+.articles-heading h2 { margin: 0; font-size: 1.1rem; }
+.articles-heading p { margin: 0; font-size: 0.8rem; }
+.search-clear { background: none; border: 0; padding: 4px; color: var(--accent); font-size: 0.8rem !important; }
+.home-posts { display: grid; gap: var(--home-gap); }
+.post-card { padding: var(--home-gap); min-width: 0; transition: transform 300ms ease-out; }
+.post-card time { font-size: 0.8rem; color: var(--text-secondary); }
+.post-card h3 { margin: 12px 0; font-size: 1.35rem; overflow-wrap: anywhere; }
+.post-card h3 a { color: var(--text-primary); }
+.post-description { margin: 0 0 16px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.post-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; }
+.post-tags button { color: var(--accent); background: rgba(159,199,246,0.08); border: 1px solid var(--panel-border); border-radius: 999px; padding: 4px 10px; font-size: 0.8rem; }
+.search-empty { color: var(--text-secondary); line-height: 1.75; }
+.reveal-card { position: relative; isolation: isolate; }
+.reveal-card::before, .reveal-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--reveal-opacity, 0);
+  transition: opacity 300ms ease;
+}
+.reveal-card::before {
+  z-index: -1;
+  background: radial-gradient(320px circle at var(--reveal-x, 50%) var(--reveal-y, 50%), rgba(255,255,255,0.09), transparent 75%);
+}
+.reveal-card::after {
+  padding: 1px;
+  background: radial-gradient(180px circle at var(--reveal-x, 50%) var(--reveal-y, 50%), rgba(255,255,255,0.65), transparent 80%);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+}
+.home-topbar:is(.overlay-active, .overlay-closing)::before,
+.home-topbar:is(.overlay-active, .overlay-closing)::after { opacity: 0; }

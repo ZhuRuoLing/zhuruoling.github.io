@@ -4,7 +4,7 @@
  * 设计约束：
  *  - 不接受任何用户输入。canvas 是哑的（pointer-events: none 由 CSS 保证）。
  *  - 不 import 任何项目内模块，不依赖 Vue/React。纯粹的时间驱动。
- *  - 生命周期自管理，暴露 destroy() 以防将来接入 View Transitions。
+ *  - 客户端导航保留 canvas 与运行时；destroy() 仅供真正销毁背景时使用。
  *  - 通过 CSS 变量单向读取外部配置，不反向耦合。
  */
 import {
@@ -74,8 +74,7 @@ function readNumberVar(name: string, fallback: number): number {
 }
 
 /**
- * 加载 6 张全景分片。允许通过 `?size=` 之类的查询串覆盖，
- * 这里保持最简单：固定从 `src` 目录读取。
+ * 按路径前缀与扩展名加载 6 张全景分片。
  */
 async function loadFaces(
   basePath: string,
@@ -118,8 +117,8 @@ async function loadFaces(
 /**
  * 启动背景。
  *
- * @param canvas 已经存在于 DOM 中的 canvas 元素（由 boot 脚本创建）
- * @param basePath 全景分片路径前缀，不含 `_0.jpeg` 后缀
+ * @param canvas 布局输出并在客户端导航中持久化的 canvas 元素
+ * @param basePath 全景分片路径前缀，不含 `_0.webp` 后缀
  */
 export async function startBackground(
   canvas: HTMLCanvasElement,

@@ -10,17 +10,19 @@ export async function getStaticPaths() {
   }));
 }
 
+import { siteName } from '../../data/profile';
+import SiteHeader from '../../components/SiteHeader.astro';
+
 const { post } = Astro.props;
 const { Content } = await render(post);
 ---
 
-<BaseLayout title={`${post.data.title} · takeneko`} description={post.data.description}>
-  <main class="shell">
-    <div class="panel">
+<BaseLayout title={`${post.data.title} · ${siteName}`} description={post.data.description}>
+  <main class="home-shell">
+    <SiteHeader article />
+    <div class="panel article-content" data-route-content>
       <p style="font-size: 0.85em; color: var(--text-secondary); margin: 0">
-        <a href="/">← 返回</a>
-        {' · '}
-        {post.data.date.toISOString().slice(0, 10)}
+        <time datetime={post.data.date.toISOString()}>{post.data.date.toISOString().slice(0, 10)}</time>
       </p>
 
       <h1>{post.data.title}</h1>

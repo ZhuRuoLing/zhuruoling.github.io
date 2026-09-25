@@ -3,84 +3,49 @@
  * 全局壳。
  *
  * 背景层与内容层的契约：
- *   - canvas 由 boot 脚本同步创建（见下方 is:inline script），本组件不参与
+ *   - canvas 随布局输出，客户端导航时保留节点与渲染器
  *   - 内容永远在 canvas 之上（canvas z-index:0，内容 z-index:1）
  *   - 内容层不需要 import 任何背景相关代码
  */
+import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
+import CustomCursor from '../components/CustomCursor.astro';
+import { siteName } from '../data/profile';
 
 interface Props {
-  title: string;
+  title?: string;
   description?: string;
 }
 
-const { title, description = 'takeneko' } = Astro.props;
+const { title = siteName, description = siteName } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" transition:animate="none">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" type="image/png" href="/icon.png" />
-
-    {/*
-      背景启动器。
-
-      is:inline 的语义：不打包、不处理、原样输出。它同步执行，
-      因此 canvas 在首屏内容绘制之前就已存在于 DOM，避免背景晚于内容出现。
-
-      它自己不做渲染，只是把 canvas 放置到 window.__bgCanvas，
-      由打包后的背景脚本（下方 module script）接手。
-    */}
-    <script is:inline>
-      (function () {
-        var canvas = document.createElement('canvas');
-        canvas.id = 'bg-canvas';
-        canvas.setAttribute('aria-hidden', 'true');
-        canvas.style.cssText = [
-          'position:fixed',
-          'top:0',
-          'left:0',
-          'width:100%',
-          'height:100%',
-          'z-index:0',
-          'pointer-events:none',
-          'display:block',
-        ].join(';');
-
-        // 暴露给渲染脚本认领。用 window 而非 DOM 查询，
-        // 是因为背景脚本只需知道"渲染目标是谁"，不关心页面结构
-        window.__bgCanvas = canvas;
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', function () {
-            document.body.prepend(canvas);
-          });
-        } else {
-          document.body.prepend(canvas);
-        }
-      })();
-    </script>
+    <ClientRouter fallback="swap" />
   </head>
   <body>
+    <canvas
+      id="bg-canvas"
+      aria-hidden="true"
+      transition:persist="panorama-background"
+      transition:animate="none"
+      style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block"
+    ></canvas>
+    <CustomCursor />
     <slot />
 
-    {/*
-      真正的渲染器。这是 module script，由 Vite 打包，因此：
-        - three.js 会被正确 tree-shake 并带 content hash
-        - 可以写 TypeScript，可以有静态 import
-        - 不阻塞首屏（type=module 默认 defer）
-
-      它从 window.__bgCanvas 认领已经存在的 canvas。
-    */}
     <script>
       import { startBackground } from '../scripts/background';
 
-      const canvas = window.__bgCanvas;
-      if (canvas instanceof HTMLCanvasElement) {
+      const canvas = document.querySelector<HTMLCanvasElement>('#bg-canvas');
+      if (canvas) {
         startBackground(canvas, '/panorama');
       }
     </script>
