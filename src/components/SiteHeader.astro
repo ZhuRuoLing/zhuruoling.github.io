@@ -19,10 +19,12 @@ const Name = article ? 'p' : 'h1';
         <Name class="profile-name">{siteName}</Name>
         <p class="profile-bio">
           <span class="home-sr-only" data-bio-readable>{bios[0]}</span>
+          {/* 视觉占位层（漢字幽灵）：纯装饰，对抽取器隐藏。
+              每个 bio 各一个 span，共用 grid-area 1/1，由最高的那个决定行高。 */}
           {bios.map((bio) => (
-            <span class="profile-bio-space" aria-hidden="true">{'漢'.repeat(Array.from(bio).length)}</span>
+            <span class="profile-bio-space" aria-hidden="true" data-header-decoration>{'漢'.repeat(Array.from(bio).length)}</span>
           ))}
-          <span class="profile-bio-visual" data-bio-visual aria-hidden="true">{bios[0]}</span>
+          <span class="profile-bio-visual" data-bio-visual aria-hidden="true" data-header-decoration>{bios[0]}</span>
         </p>
       </div>
     </div>
@@ -51,7 +53,7 @@ const Name = article ? 'p' : 'h1';
       </button>
     </div>
   </div>
-  <div id="site-overlay" class="topbar-overlay" data-overlay inert aria-hidden="true">
+  <div id="site-overlay" class="topbar-overlay" data-overlay inert aria-hidden="true" hidden data-header-decoration>
     <div class="overlay-content">
       <button class="profile-link overlay-back" type="button" data-close-overlay aria-label="返回顶栏">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7M7 12h14" /></svg>
