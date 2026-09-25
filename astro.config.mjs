@@ -1,10 +1,16 @@
 // @ts-check
 import {defineConfig} from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
     // 用户主页仓库（user.github.io），base 必须保持默认 '/'
     site: 'https://zhuruoling.github.io',
     output: 'static',
+    integrations: [
+        // 产出 /sitemap-index.xml + /sitemap-0.xml，并在 build 时写入 robots.txt 引用。
+        // 这是 crawler / LLM 发现全部文章的唯一标准通道，依赖上面的 site（必须为绝对 URL）。
+        sitemap(),
+    ],
     build: {
         // 产出 /blog/hello/index.html 形式，GH Pages 天然支持
         format: 'directory',

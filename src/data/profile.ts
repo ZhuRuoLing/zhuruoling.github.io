@@ -1,5 +1,13 @@
 export const siteName = '竹猫的Blog';
 
+/**
+ * 站点根 URL（无尾斜杠）。
+ * 与 astro.config.mjs 的 `site` 保持一致 —— 这里供 layout 拼接 canonical / og:url 使用。
+ */
+export const siteUrl = 'https://zhuruoling.github.io';
+
+export const author = 'ZhuRuoLing';
+
 export const bios = [
     '他们说传奇不会飞，我愿意当那个飞物',
     '一只被困在人身体里的猫',

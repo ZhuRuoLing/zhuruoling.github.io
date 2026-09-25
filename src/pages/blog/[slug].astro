@@ -17,7 +17,13 @@ const {post} = Astro.props;
 const {Content} = await render(post);
 ---
 
-<BaseLayout title={`${post.data.title} · ${siteName}`} description={post.data.description}>
+<BaseLayout
+        title={`${post.data.title} · ${siteName}`}
+        description={post.data.description}
+        date={post.data.date}
+        tags={post.data.tags}
+        isArticle
+>
     <main class="home-shell">
         <SiteHeader article/>
         <div class="panel article-content" data-route-content>
