@@ -95,20 +95,39 @@
       dot!.classList.toggle('cursor-dot--hover', hovering);
     }
 
+    // Pointer events keep reaching window while a DOM scrollbar captures the pointer.
+    function handlePointerMove(event: PointerEvent) {
+      if (event.isPrimary && event.pointerType !== 'touch') handleMouseMove(event);
+    }
+    function handlePointerDown(event: PointerEvent) {
+      if (!event.isPrimary || event.pointerType === 'touch' || event.button !== 0) return;
+      handleMouseMove(event);
+      handleMouseDown();
+    }
+    function handlePointerUp(event: PointerEvent) {
+      if (event.isPrimary && event.pointerType !== 'touch') handleMouseUp();
+    }
+
     document.documentElement.classList.add('has-custom-cursor');
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    document.addEventListener('mouseleave', handleMouseLeave);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    document.addEventListener('pointerleave', handleMouseLeave);
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+    window.addEventListener('lostpointercapture', handlePointerUp);
+    window.addEventListener('blur', handleMouseUp);
     document.addEventListener('astro:after-swap', handleAfterSwap);
     rafId = requestAnimationFrame(tick);
 
     return () => {
       document.documentElement.classList.remove('has-custom-cursor');
-      window.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerleave', handleMouseLeave);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+      window.removeEventListener('lostpointercapture', handlePointerUp);
+      window.removeEventListener('blur', handleMouseUp);
       document.removeEventListener('astro:after-swap', handleAfterSwap);
       cancelAnimationFrame(rafId);
       handleMouseLeave();
@@ -119,11 +138,18 @@
   }
 
   let cleanup = initCursor();
+  let suspended = false;
+  window.matchMedia('(pointer: fine)').addEventListener('change', () => {
+    cleanup?.();
+    cleanup = suspended ? undefined : initCursor();
+  });
   window.addEventListener('pagehide', () => {
+    suspended = true;
     cleanup?.();
     cleanup = undefined;
   });
   window.addEventListener('pageshow', (event) => {
+    suspended = false;
     if (event.persisted) cleanup = initCursor();
   });
 </script>

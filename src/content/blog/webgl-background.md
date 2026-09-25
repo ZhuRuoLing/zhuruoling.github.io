@@ -18,12 +18,12 @@ tags:
 ```ts
 // 自包含的运行时：只依赖一个已经存在的 canvas
 export async function startBackground(
-  canvas: HTMLCanvasElement,
-  basePath = '/panorama',
+    canvas: HTMLCanvasElement,
+    basePath = '/panorama',
 ): Promise<BackgroundHandle> {
-  const renderer = new WebGLRenderer({ canvas, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  // ...
+    const renderer = new WebGLRenderer({canvas, alpha: false});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // ...
 }
 ```
 
@@ -33,7 +33,7 @@ export async function startBackground(
 
 ```css
 :root {
-  --bg-yaw-speed: 0.018;
+    --bg-yaw-speed: 0.018;
 }
 ```
 
@@ -41,8 +41,8 @@ JavaScript 侧读取：
 
 ```js
 const raw = getComputedStyle(document.documentElement)
-  .getPropertyValue('--bg-yaw-speed')
-  .trim();
+    .getPropertyValue('--bg-yaw-speed')
+    .trim();
 ```
 
 ## 相机逻辑的全部
@@ -51,11 +51,11 @@ const raw = getComputedStyle(document.documentElement)
 
 ```js
 function frame(now) {
-  const delta = Math.min((now - lastTime) / 1000, 0.1);
-  lastTime = now;
-  yaw += options.yawSpeed * delta;
-  camera.rotation.set(0, yaw, 0, 'YXZ');
-  renderer.render(scene, camera);
+    const delta = Math.min((now - lastTime) / 1000, 0.1);
+    lastTime = now;
+    yaw += options.yawSpeed * delta;
+    camera.rotation.set(0, yaw, 0, 'YXZ');
+    renderer.render(scene, camera);
 }
 ```
 
