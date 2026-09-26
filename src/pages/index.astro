@@ -8,10 +8,13 @@ import '../styles/home.css';
 const posts = (await getCollection('blog', ({data}) => !data.draft)).sort(
     (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
+// 搜索索引只保留标题 / 摘要 / 标签 —— 不内嵌 post.body。
+// 理由: body 是整篇 markdown 的副本，会在首页 HTML 里重复一遍全文，
+//       让抽取器把首页看成文章内容的第二个 URL。摘要 + 标签足够支撑站内搜索。
 const searchIndex = posts.map((post) => ({
     id: post.id,
     tags: post.data.tags,
-    text: [post.data.title, post.data.description ?? '', post.body ?? '', ...post.data.tags].join('\n'),
+    text: [post.data.title, post.data.description ?? '', ...post.data.tags].join('\n'),
 }));
 ---
 

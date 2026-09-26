@@ -6,18 +6,66 @@
     *   - canvas 随布局输出，客户端导航时保留节点与渲染器
     *   - 内容永远在 canvas 之上（canvas z-index:0，内容 z-index:1）
     *   - 内容层不需要 import 任何背景相关代码
+    *
+    * SEO / 机器可读层（本文件负责）：
+    *   - canonical + og + twitter card + author，以及 BlogPosting 结构化数据
+    *   - 所有 URL 由 Astro.site / Astro.url 推导，不硬编码，换域名只需改 config 的 site
     */
 import {ClientRouter} from 'astro:transitions';
 import '../styles/global.css';
 import CustomCursor from '../components/CustomCursor.astro';
-import {siteName} from '../data/profile';
+import {siteName, siteUrl, author} from '../data/profile';
 
 interface Props {
     title?: string;
     description?: string;
+    /** 文章发布时间。传入后本页按 BlogPosting 输出结构化数据。 */
+    date?: Date;
+    /** 文章标签。 */
+    tags?: string[];
+    /** 是否文章页。为 true 时 og:type 用 article。 */
+    isArticle?: boolean;
 }
 
-const {title = siteName, description = siteName} = Astro.props;
+const {
+    title = siteName,
+    description = siteName,
+    date,
+    tags = [],
+    isArticle = false,
+} = Astro.props;
+
+// Astro.url 在 dev / build 下都是当前页的完整 URL，末尾带 '/'（因为 format: 'directory'）。
+// canonical 统一用带尾斜杠的形式，和 sitemap 产出的 URL 保持一致。
+const canonical = new URL(Astro.url.pathname, siteUrl).href;
+
+// og:image 用站点图标。换成 1200x630 的专用社交图会更好，但远程 URL 必须可公开访问。
+const ogImage = new URL('/icon.png', siteUrl).href;
+
+const jsonLd = isArticle && date
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: title,
+        description,
+        datePublished: date.toISOString(),
+        dateModified: date.toISOString(),
+        author: {'@type': 'Person', name: author, url: siteUrl},
+        publisher: {'@type': 'Organization', name: siteName, url: siteUrl},
+        mainEntityOfPage: {'@type': 'WebPage', '@id': canonical},
+        url: canonical,
+        ...(tags.length > 0 ? {keywords: tags.join(', ')} : {}),
+        inLanguage: 'zh-CN',
+    }
+    : {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: siteName,
+        description,
+        url: siteUrl,
+        author: {'@type': 'Person', name: author, url: siteUrl},
+        inLanguage: 'zh-CN',
+    };
 ---
 
 <!doctype html>
@@ -27,7 +75,29 @@ const {title = siteName, description = siteName} = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{title}</title>
     <meta name="description" content={description}/>
+    <meta name="author" content={author}/>
     <link rel="icon" type="image/png" href="/icon.png"/>
+    <link rel="canonical" href={canonical}/>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={isArticle ? 'article' : 'website'}/>
+    <meta property="og:site_name" content={siteName}/>
+    <meta property="og:title" content={title}/>
+    <meta property="og:description" content={description}/>
+    <meta property="og:url" content={canonical}/>
+    <meta property="og:image" content={ogImage}/>
+    <meta property="og:locale" content="zh_CN"/>
+    {isArticle && date && <meta property="article:published_time" content={date.toISOString()}/>}
+    {isArticle && tags.map((tag) => <meta property="article:tag" content={tag}/>)}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content={title}/>
+    <meta name="twitter:description" content={description}/>
+    <meta name="twitter:image" content={ogImage}/>
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}/>
+
     <ClientRouter fallback="swap"/>
 </head>
 <body>

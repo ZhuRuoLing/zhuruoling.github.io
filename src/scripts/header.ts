@@ -64,6 +64,8 @@ function initOverlay(topbar: HTMLElement, motion: MediaQueryList, signal: AbortS
         topbar.classList.remove('overlay-active', 'overlay-closing');
         overlay.inert = true;
         overlay.setAttribute('aria-hidden', 'true');
+        // 与初始 markup 的 `hidden` 保持一致：关着的 overlay 不进 DOM 文本抽取。
+        overlay.hidden = true;
         normal.inert = false;
         normal.removeAttribute('aria-hidden');
         buttons.forEach(button => button.setAttribute('aria-expanded', 'false'));
@@ -97,6 +99,7 @@ function initOverlay(topbar: HTMLElement, motion: MediaQueryList, signal: AbortS
         opener = button;
         mode = nextMode;
         state = 'open';
+        overlay.hidden = false;
         overlay.inert = false;
         overlay.setAttribute('aria-hidden', 'false');
         views.forEach(view => {
