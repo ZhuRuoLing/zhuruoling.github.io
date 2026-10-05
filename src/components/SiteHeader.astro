@@ -19,10 +19,18 @@ const Name = article ? 'p' : 'h1';
         <Name class="profile-name">{siteName}</Name>
         <p class="profile-bio">
           <span class="home-sr-only" data-bio-readable>{bios[0]}</span>
-          {/* 视觉占位层（漢字幽灵）：纯装饰，对抽取器隐藏。
-              每个 bio 各一个 span，共用 grid-area 1/1，由最高的那个决定行高。 */}
+          {/* 视觉占位层（漢字幽灵）：纯装饰，对文本抽取器隐藏。
+              每个 bio 各一个 span，共用 grid-area 1/1，由最高的那个决定行高。
+              占位字符不再写成真实文本节点（旧实现会被搜索引擎/摘要抽取器
+              当成正文抓走），改为组件只传真实 bio 的字数 --bio-len，
+              由 CSS 的 ::after 撑出等宽空间——伪元素 content 不进 DOM 文本流。 */}
           {bios.map((bio) => (
-            <span class="profile-bio-space" aria-hidden="true" data-header-decoration>{'漢'.repeat(Array.from(bio).length)}</span>
+            <span
+              class="profile-bio-space"
+              aria-hidden="true"
+              data-header-decoration
+              style={`--bio-len:${Array.from(bio).length}`}
+            />
           ))}
           <span class="profile-bio-visual" data-bio-visual aria-hidden="true" data-header-decoration>{bios[0]}</span>
         </p>

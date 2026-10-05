@@ -96,6 +96,16 @@
     min-width: 0;
 }
 
+/* 视觉占位层：只用 CSS 撑出与真实 bio 等量的空间，DOM 里不含任何字符。
+   伪元素 content 不进 DOM 文本流 → 搜索引擎/摘要抽取器抓不到。
+   宽度用 em 近似 CJK 全角字宽，保证多行换行点与真实文案一致，
+   由最高的那个 span 决定 .profile-bio 网格行高（防止动画换句时抖动）。 */
+.profile-bio-space::after {
+    content: "";
+    display: inline-block;
+    width: calc(var(--bio-len, 0) * 1em);
+}
+
 .profile-bio-space {
     visibility: hidden;
     max-height: 3.2em;
